@@ -1,0 +1,2 @@
+# Stable MCP Python SDK line as of 2026-07-30.
+mcp>=1.28,<2
