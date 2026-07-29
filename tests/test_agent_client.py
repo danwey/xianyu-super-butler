@@ -80,6 +80,26 @@ class XianyuClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("receiver_address", order)
         self.assertEqual(cards, [{"id": 1, "name": "test", "type": "text", "enabled": True}])
 
+    async def test_raw_data_order_list_is_not_returned(self) -> None:
+        async def handler(request: httpx.Request) -> httpx.Response:
+            if request.url.path == "/verify":
+                return httpx.Response(200, json={"authenticated": True})
+            if request.url.path == "/api/orders":
+                return httpx.Response(200, json={
+                    "data": [{
+                        "order_id": "o-2",
+                        "receiver_phone": "13900000000",
+                    }],
+                    "total": 1,
+                })
+            return httpx.Response(404, json={"detail": "not found"})
+
+        async with XianyuClient(transport=httpx.MockTransport(handler)) as client:
+            result = await client.list_orders()
+
+        self.assertNotIn("data", result)
+        self.assertEqual(result["orders"], [{"order_id": "o-2"}])
+
 
 if __name__ == "__main__":
     unittest.main()

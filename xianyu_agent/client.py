@@ -208,8 +208,13 @@ class XianyuClient:
         if not isinstance(orders, list):
             raise XianyuClientError("订单列表返回格式无效")
         safe_orders = [_strip_fields(item, _PRIVATE_ORDER_FIELDS) for item in orders]
+        metadata = {
+            key: value
+            for key, value in result.items()
+            if key not in {"orders", "data"}
+        }
         return {
-            **result,
+            **metadata,
             "orders": safe_orders,
             "total": result.get("total", len(safe_orders)),
             "page": result.get("page", page),
