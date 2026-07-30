@@ -1,0 +1,16 @@
+FROM python:3.11-slim-bookworm
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /app
+
+COPY agent-requirements.txt ./
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r agent-requirements.txt
+
+COPY xianyu_agent ./xianyu_agent
+
+EXPOSE 8000
+
+CMD ["python", "-m", "xianyu_agent.mcp_server"]
