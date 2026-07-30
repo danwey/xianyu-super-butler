@@ -97,7 +97,12 @@ def main() -> None:
     if transport == "stdio":
         mcp.run()
     elif transport in {"streamable-http", "sse"}:
-        mcp.run(transport=transport)
+        host = os.getenv("XIANYU_MCP_HOST", "127.0.0.1").strip() or "127.0.0.1"
+        try:
+            port = int(os.getenv("XIANYU_MCP_PORT", "8000"))
+        except ValueError as exc:
+            raise SystemExit("XIANYU_MCP_PORT 必须是整数") from exc
+        mcp.run(transport=transport, host=host, port=port)
     else:
         raise SystemExit(f"不支持的 XIANYU_MCP_TRANSPORT: {transport}")
 
